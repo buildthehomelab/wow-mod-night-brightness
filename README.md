@@ -9,6 +9,8 @@ player's "moody" is another's "can't see the road". With this module and its cli
 
 - **`.night` shows your level, `.night 1` to `.night 5` sets it.** 1 is the darkest, 3 is the
   realm's own night, 5 the brightest.
+- **Or use the slider.** The optional NightBrightness addon puts it in Interface > AddOns (or
+  `/night`).
 - **Only the night changes.** The day is the same at every level; dusk and dawn fade between
   the day and your night.
 - **Only you see it.** Each client is sent its own lighting; nobody else's night changes.
@@ -33,6 +35,8 @@ Category: World
 - You can now set how dark your own nights are. Type `.night` to see your setting and `.night 1`
   (darkest) to `.night 5` (brightest) to change it. It applies to all your characters and changes
   nothing for anyone else.
+- The optional **Night Brightness** addon adds a slider for it under Interface > AddOns. Type
+  `/night` to open it.
 
 ## Requirements
 
@@ -64,6 +68,28 @@ client is told about lighting rows it doesn't have, and ignores that.
    (each account's level). `data/sql/uninstall/` takes both out again, by hand.
 
 4. Put the client patch where your players get their patches from.
+
+5. Optional: the addon in `addon/NightBrightness` (see below).
+
+## The addon
+
+`addon/NightBrightness` is a slider for the same setting, under Interface > AddOns > Night
+Brightness. `/night` opens it, `/night 1` to `/night 5` sets the level directly. It is a face for
+the `.night` command and needs no server change:
+
+- after login it sends `.night` once and reads the answer;
+- when the slider has rested for half a second it sends `.night <level>`, one change at a time,
+  and waits for the fade before the next (on "The night is still changing" it tries again);
+- it keeps the answers to its own commands out of the chat window and shows them in the panel;
+- a level typed by hand moves the slider too.
+
+Nothing is saved in the client: the level stays the account's, on the server. Without the module
+on the realm the panel says so after ten seconds. It uses Blizzard's own frames, so DragonUI and
+other interface addons restyle it like any options page.
+
+To hand it out with Portalkeeper, add a `mod_realm_config_addon` row: source
+`https://github.com/buildthehomelab/wow-mod-night-brightness`, ref `main`, install directory
+`NightBrightness`.
 
 ## Configuration
 
