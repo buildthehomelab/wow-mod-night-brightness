@@ -1,0 +1,28 @@
+[worldserver]
+
+########################################
+# mod-night-brightness
+#
+# Lets each player set how bright their own night is, with .night 1 (darkest) to .night 5
+# (brightest). Needs the client patch patch-z98-night-brightness.MPQ, which holds the night at
+# each level, and the list of lights built together with it (mod_night_brightness_light).
+########################################
+
+#
+#    NightBrightness.Enable
+#        Description: Master switch. Off: the command is refused and nobody is sent a level, so
+#                     everyone sees the realm's own night (level 3).
+#        Default:     1
+#
+
+NightBrightness.Enable = 1
+
+#
+#    NightBrightness.FadeMs
+#        Description: How long the client takes to fade from one level to the next when a player
+#                     changes it, in milliseconds. A player can change the level again once the
+#                     fade is over.
+#        Default:     1500
+#
+
+NightBrightness.FadeMs = 1500
