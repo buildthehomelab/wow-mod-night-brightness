@@ -1,0 +1,7 @@
+## Interface: 30300
+## Title: Night Brightness
+## Notes: A slider for how bright your own nights are (Interface > AddOns, or /night). Needs mod-night-brightness on the realm.
+## Author: buildthehomelab
+## Version: 1.0.0
+
+NightBrightness.lua
