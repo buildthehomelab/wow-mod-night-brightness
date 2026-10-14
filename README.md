@@ -23,10 +23,10 @@ player's "moody" is another's "can't see the road". With this module and its cli
 | Level | Night | |
 | --- | --- | --- |
 | 1 | 0.6 x | darkest |
-| 2 | 0.83 x | dark: the realm's night as it was before 2026-10-13 |
-| 3 | 1 x | normal: the realm's night, what a player sees who never used the command |
+| 2 | 0.83 x | dark |
+| 3 | 1 x | normal: the night of the client the patch was built from, what a player sees who never used the command |
 | 4 | 1.4 x | bright |
-| 5 | 2 x | brightest: about the night of the Reforged HD client the realm is built on |
+| 5 | 2 x | brightest, but never brighter than the day |
 
 ## Patch Notes: Night Brightness
 
@@ -42,12 +42,10 @@ Category: World
 
 - AzerothCore WotLK (written against the mod-playerbots branch at `2a2211c`). Needs a core with
   `WorldSession::IsHeadless()`.
-- The client patch `patch-z98-night-brightness.MPQ`, which holds the night at each level. It is
-  built by `tools/client-patches/night_levels.py` in
-  [wow-server](https://github.com/buildthehomelab/wow-server) from the realm's other lighting
-  patches. The same run writes this module's `data/sql/db-world/mod_night_brightness_light.sql`:
-  **the patch and that file belong together**. Build both again whenever the realm's lighting
-  changes.
+- A client patch that holds the night at each level, built from your players' client by
+  `tools/build_patch.py` (see "Building the client patch"). The same run writes this module's
+  `data/sql/db-world/mod_night_brightness_light.sql`: **the patch and that file belong
+  together**. Build both again whenever your client's lighting changes.
 
 A player whose client doesn't have the patch sees the realm's own night at every level: the
 client is told about lighting rows it doesn't have, and ignores that.
@@ -67,7 +65,38 @@ client is told about lighting rows it doesn't have, and ignores that.
    world database (the lights of each level), `mod_night_brightness` in the characters database
    (each account's level). `data/sql/uninstall/` takes both out again, by hand.
 
-4. Put the client patch where your players get their patches from.
+4. Build the client patch and the SQL for your client (below), and put the patch where your
+   players get their patches from. The SQL in this repository comes from one HD client with
+   lighting patches of its own; a stock 3.3.5a client has other Light rows and needs its own
+   build.
+
+## Building the client patch
+
+```bash
+python3 tools/build_patch.py --client /path/to/client --out patch-z98-night-brightness.MPQ \
+    --sql data/sql/db-world/mod_night_brightness_light.sql
+```
+
+- `--client` is the 3.3.5a client folder your players have (with `Data/` and `Data/enUS/`;
+  `--locale` for another language). The four lighting tables (`Light`, `LightParams`,
+  `LightIntBand`, `LightFloatBand`) are read from the last archive the client loads that has
+  each.
+- `--patch` adds a patch your players get on top of that client, such as your own lighting
+  patch. Repeat it, in load order. Leave the night brightness patch itself out.
+- `--out` is the patch. It carries all four lighting tables, so it has to load after every other
+  patch that has one: give it a name that sorts after theirs (a `patch-z` name does).
+- `--sql` writes the module's list of swaps. Restart the server after replacing it; the updater
+  applies it again.
+- `--check` also counts, per map, how often the fixed order of the swaps blends zone borders
+  differently from the client's own order (see "Known limits").
+
+The night at a level is the night the client shows, scaled on one clock: by day (06:00 to
+19:00) nothing changes, from 21:00 to 04:30 every colour is the level's share, and in between it
+fades. A brighter level stops at the colour the same light has at noon. Places with one fixed
+colour, most dungeons and interiors, have no night and stay as they are.
+
+Needs Python 3 and [StormLib](https://github.com/ladislav-zezula/StormLib) (`STORMLIB` for its
+path, default `/usr/local/lib/libstorm.dylib`).
 
 5. Optional: the addon in `addon/NightBrightness` (see below).
 
@@ -147,7 +176,7 @@ background.
 - **Zone borders.** The client sorts a map's zone lights by distance every frame; a list of
   swaps has one fixed order. Where two zones' lights overlap, a level other than 3 can blend
   them a little differently from the stock night: in a model of the lights, at about one place
-  in a hundred or fewer on the continents (`night_levels.py --check` counts it).
+  in a hundred or fewer on the continents (`tools/build_patch.py --check` counts it).
 - **The core's own light swaps.** A few boss fights change a room's lighting the same way, on
   the map's default light row. They arrive after this module's list and are drawn on top of
   it. A level changed in the middle of such a fight is laid over the fight's lighting until the
@@ -164,7 +193,7 @@ background.
   `mod_night_brightness_light` is empty (the startup log says how many swaps were loaded).
 - **A level changes nothing:** it is day (the levels differ from 21:00 to 04:30, and partly
   from 19:00 and until 06:00), or the character is in Northrend, or the client doesn't have
-  `patch-z98-night-brightness.MPQ`, or the patch and the module's SQL are from different builds.
+  the client patch, or the patch and the module's SQL are from different builds.
 - **A zone looks wrong at a level but right at 3:** see "Zone borders" above; note the place.
 
 ## License
