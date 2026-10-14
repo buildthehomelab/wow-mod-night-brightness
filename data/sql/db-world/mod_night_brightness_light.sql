@@ -2,9 +2,8 @@
 -- map, in the order the client has to get them. `area_light` is the row whose place and reach
 -- the swap takes, `light` the row drawn there: for a zone light the level's copy of it, both
 -- times; for the map's default light, at position 0, the level's row that reaches everywhere.
--- Written by wow-server's tools/client-patches/night_levels.py together with
--- patch-z98-night-brightness.MPQ, which holds the rows named here. Don't edit; build both
--- again.
+-- Written by the patch builder together with the client patch, which holds the rows named here.
+-- Don't edit; build both again.
 
 CREATE TABLE IF NOT EXISTS `mod_night_brightness_light` (
     `level`      TINYINT UNSIGNED NOT NULL,
