@@ -167,10 +167,6 @@ background.
   `patch-z98-night-brightness.MPQ`, or the patch and the module's SQL are from different builds.
 - **A zone looks wrong at a level but right at 3:** see "Zone borders" above; note the place.
 
-## Credits
-
-Written for the Vaultrona / Evermore realm.
-
 ## License
 
 MIT, see [LICENSE](LICENSE).
