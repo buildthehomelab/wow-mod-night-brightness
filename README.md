@@ -106,7 +106,8 @@ path, default `/usr/local/lib/libstorm.dylib`).
 Brightness. `/night` opens it, `/night 1` to `/night 5` sets the level directly. It is a face for
 the `.night` command and needs no server change:
 
-- after login it sends `.night` once and reads the answer;
+- the first time its panel opens (or `/night` is used) it sends `.night` once and reads the
+  answer; it asks nothing at login, so nothing shows in chat then;
 - when the slider has rested for half a second it sends `.night <level>`, one change at a time,
   and waits for the fade before the next (on "The night is still changing" it tries again);
 - it keeps the answers to its own commands out of the chat window and shows them in the panel;

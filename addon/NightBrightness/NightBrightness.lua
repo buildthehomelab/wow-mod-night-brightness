@@ -1,8 +1,8 @@
 -- NightBrightness: a slider for mod-night-brightness.
 --
 -- The server keeps each account's night brightness and changes it with the .night chat command.
--- This addon is a face for that command: it asks for the level once after login, sends
--- ".night <level>" when the slider moves, and reads the answers the server prints in chat
+-- This addon is a face for that command: it asks for the level the first time its panel opens
+-- (or /night is used), not at login, sends ".night <level>" when the slider moves, and reads the answers the server prints in chat
 -- (hiding the ones it asked for). Nothing is saved on this side.
 --
 -- The server lets a level change only once the last one has faded in (it says "The night is
@@ -16,7 +16,6 @@ local AFTER_CHANGE = 5     -- the server's fade (1.5 s) and wait (3 s) after a c
 local RETRY = 2            -- after "still changing"
 local TIMEOUT = 10         -- no answer by then: the realm doesn't run the module
 local HIDE_FOR = 6         -- how long the answer to our own command is kept out of chat
-local FIRST_ASK = 3        -- after the first loading screen
 
 -- The server's lines (mod-night-brightness, NightBrightness.cpp).
 local SHOWN = "^Your night brightness is (%d)"
@@ -32,7 +31,7 @@ local askedAt = 0
 local nextSend = 0        -- don't send before this
 local settleAt = 0
 local hideUntil = 0
-local queryAt             -- when to ask for the level after login
+local queryAt             -- when to ask for the level; nil until something needs it
 local state = "waiting"   -- waiting, ready, off, absent
 
 local panel, slider, levelText, statusText
@@ -73,6 +72,13 @@ local function ShowLevel(level)
     levelText:SetText(Describe(level))
 end
 
+-- Ask the server for the level once, the first time the panel or /night needs it.
+local function AskSoon()
+    if not queryAt then
+        queryAt = GetTime()
+    end
+end
+
 local function Send(command, what)
     asked, askedAt = what, GetTime()
     hideUntil = askedAt + HIDE_FOR
@@ -106,14 +112,9 @@ local function OnSystemMessage(msg)
 end
 
 local driver = CreateFrame("Frame")
-driver:RegisterEvent("PLAYER_ENTERING_WORLD")
 driver:RegisterEvent("CHAT_MSG_SYSTEM")
 driver:SetScript("OnEvent", function(self, event, msg)
-    if event == "CHAT_MSG_SYSTEM" then
-        OnSystemMessage(msg)
-    elseif not queryAt then
-        queryAt = GetTime() + FIRST_ASK
-    end
+    OnSystemMessage(msg)
 end)
 
 local elapsed = 0
@@ -165,6 +166,7 @@ local function Want(level)
     level = math.max(LEVEL_MIN, math.min(LEVEL_MAX, level))
     wanted = level
     settleAt = GetTime() + SETTLE
+    AskSoon()
     if levelText then
         levelText:SetText(Describe(level))
     end
@@ -214,6 +216,7 @@ statusText:SetPoint("RIGHT", panel, "RIGHT", -32, 0)
 statusText:SetJustifyH("LEFT")
 
 panel:SetScript("OnShow", function()
+    AskSoon()
     if current then
         ShowLevel(wanted or current)
     end
