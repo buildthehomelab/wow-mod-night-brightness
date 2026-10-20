@@ -155,6 +155,29 @@ the module remembers which levels a client has been sent on its map, as a stack:
 
 Either way the night fades from one to the other.
 
+## Overlays from other modules
+
+Other modules can lay a see-through light over the night, such as the overcast skies of
+[mod-weather](https://github.com/buildthehomelab/wow-mod-weather). The client keeps one list of
+swaps for everything, and its order matters, so this module keeps the list and the other module
+asks it:
+
+```cpp
+// areaLights and lights: `count` entries, one per night level (1 to 5; 0 unused), the swap to
+// lay over that level. 0 for none. False: the client is still busy, call again later.
+extern "C" bool NightBrightness_SetOverlay(Player* player, uint32 count, uint32 const* areaLights,
+    uint32 const* lights, uint32 fadeMs);
+```
+
+Declare it weak (`__attribute__((weak))`, GCC and Clang) and check it isn't null, and the other
+module also works without this one. That needs both modules in the same binary: the default
+static module build. In a dynamic module build (`MODULES=dynamic`) or with MSVC the other module
+can't see this one and both would send swaps into the same list; run only one of them there. Each layer of the stack (the realm's own night, then each
+level a client has been sent) has its own overlay, on rows made for that level, and only the top
+one shows. A level laid on top covers the overlay below and gets its own; going back down takes
+the overlays above with it and brings the one below up to date. An overlay that is replaced or
+taken away makes the next change wait like a level change does.
+
 ## Cost
 
 Loading a continent at a level other than 3 sends one 12-byte packet per light of that map: 97
@@ -184,7 +207,11 @@ background.
   player leaves the map.
 - **One change at a time.** What is taken away has to be gone from the client's list before
   anything is added behind it, and the fade runs on the client's clock. The module makes a
-  player wait for the fade plus three seconds before the next change.
+  player wait for the fade plus three seconds before the next change. That includes an
+  overlay's change (an overcast step fades over up to 20 seconds), so `.night` can ask for a
+  little patience while the weather changes; the addon tries again by itself. A level refused
+  that way goes first: for ten seconds after the client is free, overlays wait for it. A
+  `.night` that sends nothing (the level the client already has, or Northrend) never waits.
 - **Nothing here has been seen in a game client yet.** It is built from reading the client's
   code and from a model of its list.
 
