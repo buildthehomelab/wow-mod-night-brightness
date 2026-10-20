@@ -4,7 +4,7 @@
 # mod-night-brightness
 #
 # Lets each player set how bright their own night is, with .night 1 (darkest) to .night 5
-# (brightest). Needs the client patch patch-z98-night-brightness.MPQ, which holds the night at
+# (brightest). Needs the client patch built by tools/build_patch.py, which holds the night at
 # each level, and the list of lights built together with it (mod_night_brightness_light).
 ########################################
 

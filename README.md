@@ -73,7 +73,7 @@ client is told about lighting rows it doesn't have, and ignores that.
 ## Building the client patch
 
 ```bash
-python3 tools/build_patch.py --client /path/to/client --out patch-z98-night-brightness.MPQ \
+python3 tools/build_patch.py --client /path/to/client --out patch-Y.MPQ \
     --sql data/sql/db-world/mod_night_brightness_light.sql
 ```
 
@@ -84,7 +84,13 @@ python3 tools/build_patch.py --client /path/to/client --out patch-z98-night-brig
 - `--patch` adds a patch your players get on top of that client, such as your own lighting
   patch. Repeat it, in load order. Leave the night brightness patch itself out.
 - `--out` is the patch. It carries all four lighting tables, so it has to load after every other
-  patch that has one: give it a name that sorts after theirs (a `patch-z` name does).
+  patch that has one, except the overcast patch of
+  [mod-weather](https://github.com/buildthehomelab/wow-mod-weather), which loads after it. A stock
+  `Wow.exe` only loads patches with a one-character name: `patch-Y.MPQ` sorts after the digits
+  and the other letters, and leaves `patch-Z.MPQ` to the overcast patch. A longer name such as
+  `patch-z98-night-brightness.MPQ` needs a client that loads those. The builder reads every
+  `patch-*.MPQ` in `Data/`, so take out any your client doesn't load, and the overcast patch.
+  Build it again whenever one of them changes, after them; then build the overcast patch again.
 - `--sql` writes the module's list of swaps. Restart the server after replacing it; the updater
   applies it again.
 - `--check` also counts, per map, how often the fixed order of the swaps blends zone borders
