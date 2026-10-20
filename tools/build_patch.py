@@ -2,7 +2,7 @@
 """The client patch of mod-night-brightness: the night at five brightness levels, and the
 module's list of light swaps (`mod_night_brightness_light`) that goes with it.
 
-    python3 build_patch.py --client /path/to/client --out patch-z98-night-brightness.MPQ \\
+    python3 build_patch.py --client /path/to/client --out patch-Y.MPQ \\
         --sql ../data/sql/db-world/mod_night_brightness_light.sql \\
         [--patch your-lighting-patch.MPQ ...] [--check]
 
@@ -66,8 +66,13 @@ A map without Light rows of its own is lit by Light row 1 (0x7ECC4C): it gets th
 its only swap. The maps are read from the client's Map.dbc.
 
 The patch holds all four lighting tables, so it has to load after every other patch that has
-one: name it so it sorts after them (a patch-z name does). Build it again whenever any of them
-changes. The patch and the SQL have to come from the same build.
+one, except mod-weather's overcast patch, which loads after it. A stock Wow.exe only loads patches
+with a one-character name: patch-Y.MPQ sorts after the digits and the other letters, and leaves
+patch-Z.MPQ to the overcast patch. A longer name such as patch-z98-night-brightness.MPQ needs a
+client that loads those. Take patches the client doesn't load out of Data/ while building, and the
+overcast patch, or the builder reads them. Build it again whenever any of them changes, and build
+them first; then build the overcast patch again. The patch and the SQL have to come from the same
+build.
 
 Needs Python 3 and StormLib (`STORMLIB`, default /usr/local/lib/libstorm.dylib).
 """

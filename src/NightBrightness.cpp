@@ -6,7 +6,7 @@
  * The night is in the client's lighting tables, and those hold one night for everybody. But the
  * server can tell a single client to light a place with another Light.dbc row
  * (SMSG_OVERRIDE_LIGHT: the row to replace, the row to use, a fade time), and the client patch
- * patch-z98-night-brightness.MPQ carries every light once more for each level. The tool that
+ * (tools/build_patch.py) carries every light once more for each level. The tool that
  * builds the patch also writes the list of swaps a level needs on each map, in the order the
  * client has to get them (mod_night_brightness_light). This module keeps each account's level
  * and sends its swaps: when a client loads a map, and when the player changes the level.
