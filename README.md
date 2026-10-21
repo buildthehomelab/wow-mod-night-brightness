@@ -40,7 +40,7 @@ Category: World
 
 ## Requirements
 
-- AzerothCore WotLK (written against the mod-playerbots branch at `2a2211c`). Needs a core with
+- AzerothCore WotLK, from the mod-playerbots core fork. Needs a core with
   `WorldSession::IsHeadless()`.
 - A client patch that holds the night at each level, built from your players' client by
   `tools/build_patch.py` (see "Building the client patch"). The same run writes this module's
