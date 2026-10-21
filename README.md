@@ -40,8 +40,8 @@ Category: World
 
 ## Requirements
 
-- AzerothCore WotLK, from the mod-playerbots core fork. Needs a core with
-  `WorldSession::IsHeadless()`.
+- AzerothCore WotLK with `WorldSession::IsHeadless()` (azerothcore-wotlk #27533 and later).
+  mod-playerbots is not needed.
 - A client patch that holds the night at each level, built from your players' client by
   `tools/build_patch.py` (see "Building the client patch"). The same run writes this module's
   `data/sql/db-world/mod_night_brightness_light.sql`: **the patch and that file belong
